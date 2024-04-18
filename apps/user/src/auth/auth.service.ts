@@ -12,7 +12,7 @@ export const scrypt = promisify(_scrypt);
 export class AuthService {
   constructor(private userService: UserService) {}
 
-  async createAccount(createAccountDto: CreateUserDto) {
+  async create(createAccountDto: CreateUserDto) {
     const userExist = await this.userService.findOneByEmail(
       createAccountDto.email,
     );
@@ -26,7 +26,7 @@ export class AuthService {
 
     createAccountDto.password = salt + '.' + hash.toString('hex');
 
-    return createAccountDto;
+    return this.userService.create(createAccountDto);
   }
 
   async login(loginDto: LoginDto) {
