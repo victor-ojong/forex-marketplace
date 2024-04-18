@@ -31,7 +31,6 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.userService.findOneByEmail(loginDto.email);
-
     const currentUser = user;
 
     if (!currentUser) {
@@ -48,6 +47,7 @@ export class AuthService {
     if (!isValid) {
       throw new HttpException('Invalid login credentials', 403);
     }
+    // sanitize user and send jwt token and user object to client
     currentUser.password = undefined;
     return currentUser;
   }

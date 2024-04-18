@@ -19,18 +19,15 @@ export class UserService {
     const walletID = await this.generateWalletID();
 
     const user = this.userRepo.create({
-      email: createUserDto.email,
-      firstName: createUserDto.firstName,
-      lastName: createUserDto.lastName,
-      password: createUserDto.password,
+      ...createUserDto,
       walletID,
     });
-
+    // sanitize and send user object and jwt token to clien as payload
     return await this.userRepo.save(user);
   }
 
   async login(loginDto: LoginDto) {
-    return loginDto;
+    return this.authService.login(loginDto);
   }
   async findOneByEmail(email: string) {
     return await this.userRepo.findOneBy({ email });
