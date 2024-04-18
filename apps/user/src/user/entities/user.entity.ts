@@ -1,10 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export interface Balance {
-  currency: string;
-  amount: number;
-}
-
+// User entity
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -24,9 +20,6 @@ export class User {
 
   @Column()
   walletID: string;
-
-  @Column({ default: 0.0 })
-  balance: Balance[];
 
   @Column({ nullable: true })
   localBankAccount: string;

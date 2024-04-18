@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-TypeOrmModule;
+import { User } from 'apps/user/src/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ TypeOrmModule;
       useFactory: (ConfigService: ConfigService) => ({
         type: 'mongodb',
         url: ConfigService.get('MONGODB_URI'),
-        entities: ['YourEntity'],
+        entities: [User],
         synchronize: true,
       }),
       inject: [ConfigService],
