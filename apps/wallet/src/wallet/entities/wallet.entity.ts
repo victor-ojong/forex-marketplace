@@ -12,5 +12,5 @@ export class Wallet extends BaseEntity {
   walletID: string;
 
   @Column()
-  amount: string;
+  amount: number;
 }
