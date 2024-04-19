@@ -9,8 +9,9 @@ export class UserService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
   async create(createUserDto: CreateUserDto) {
-    const walletID = await this.generateWalletID();
+    const walletID = '123444A';
 
+    console.log(walletID);
     const user = this.userRepo.create({
       ...createUserDto,
       walletID,
@@ -20,7 +21,9 @@ export class UserService {
   }
 
   async findOneByEmail(email: string) {
-    return await this.userRepo.findOneBy({ email });
+    const user = await this.userRepo.findOneBy({ email });
+
+    return user;
   }
 
   async generateWalletID() {
