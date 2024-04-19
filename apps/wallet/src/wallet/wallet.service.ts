@@ -1,26 +1,88 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
-import { UpdateWalletDto } from './dto/update-wallet.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Wallet } from './entities/wallet.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class WalletService {
-  create(createWalletDto: CreateWalletDto) {
-    return 'This action adds a new wallet';
+  constructor(
+    @InjectRepository(Wallet) private walletRepo: Repository<Wallet>,
+  ) {}
+  async deposit(createWalletDto: CreateWalletDto) {
+    const currentWallet = await this.findByWalletID(createWalletDto.walletID);
+
+    const currencyExist =
+      this.getCurrencyPairs(currentWallet, createWalletDto.currency).length > 0;
+
+    if (currentWallet.length > 0 && currencyExist) {
+      // if exist, filter and add then save the user docs
+      const createdWallet = currentWallet.map((el) => {
+        if (el.currency === createWalletDto.currency) {
+          el.amount += createWalletDto.amount;
+        }
+        return el;
+      });
+
+      return await this.walletRepo.save(createdWallet);
+    }
+
+    // if not just create a new wallet pair
+    const newWallet = this.walletRepo.create({
+      ...createWalletDto,
+    });
+    return await this.walletRepo.save(newWallet);
   }
 
-  findAll() {
-    return `This action returns all wallet`;
+  async debit(debitWalletDto: CreateWalletDto) {
+    const wallet = await this.findByWalletID(debitWalletDto.walletID);
+
+    const currecnyExist = this.getCurrencyPairs(
+      wallet,
+      debitWalletDto.currency,
+    );
+
+    if (currecnyExist.length < 1) {
+      return {
+        message: `${debitWalletDto.currency} does not exist on your wallet`,
+      };
+    }
+
+    //get the amount and minus it with the one that is on the db and save
+    // but first check if the ammount is greater than available balance
+
+    const canDebit = this.checkEligibleDebitAmount(
+      currecnyExist.at(0).amount,
+      debitWalletDto.amount,
+    );
+
+    if (!canDebit) {
+      return {
+        message: `${debitWalletDto.amount} is more than your ${debitWalletDto.currency} wallet balance`,
+      };
+    }
+    const currentBalance = currecnyExist.map((el) => {
+      el.amount -= debitWalletDto.amount;
+      return el;
+    });
+
+    await this.walletRepo.save(currentBalance);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wallet`;
+  async balance(walletID: string) {
+    // format the result to make sense as balance here
+    await this.findByWalletID(walletID);
   }
 
-  update(id: number, updateWalletDto: UpdateWalletDto) {
-    return `This action updates a #${id} wallet`;
+  async findByWalletID(walletID: string) {
+    return await this.walletRepo.find({ where: { walletID } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wallet`;
+  private getCurrencyPairs(walletArray: CreateWalletDto[], currency: string) {
+    return walletArray.filter((el) => el.currency === currency);
+  }
+
+  private checkEligibleDebitAmount(walletAmount: number, debitAmount: number) {
+    return walletAmount >= debitAmount ? true : false;
   }
 }
