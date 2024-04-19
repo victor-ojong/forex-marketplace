@@ -10,13 +10,10 @@ export class WalletService {
     @InjectRepository(Wallet) private walletRepo: Repository<Wallet>,
   ) {}
   async deposit(createWalletDto: CreateWalletDto) {
-    // find an existingwalletid with the same currency and add the currency if not create new currecny object with wallet id
-
     const currentWallet = await this.findByWalletID(createWalletDto.walletID);
 
     const currencyExist =
-      currentWallet.filter((el) => el.currency === createWalletDto.currency)
-        .length > 0;
+      this.getCurrencyPairs(currentWallet, createWalletDto.currency).length > 0;
 
     if (currentWallet.length > 0 && currencyExist) {
       // if exist, filter and add then save the user docs
@@ -37,7 +34,55 @@ export class WalletService {
     return await this.walletRepo.save(newWallet);
   }
 
+  async debit(debitWalletDto: CreateWalletDto) {
+    const wallet = await this.findByWalletID(debitWalletDto.walletID);
+
+    const currecnyExist = this.getCurrencyPairs(
+      wallet,
+      debitWalletDto.currency,
+    );
+
+    if (currecnyExist.length < 1) {
+      return {
+        message: `${debitWalletDto.currency} does not exist on your wallet`,
+      };
+    }
+
+    //get the amount and minus it with the one that is on the db and save
+    // but first check if the ammount is greater than available balance
+
+    const canDebit = this.checkEligibleDebitAmount(
+      currecnyExist.at(0).amount,
+      debitWalletDto.amount,
+    );
+
+    if (!canDebit) {
+      return {
+        message: `${debitWalletDto.amount} is more than your ${debitWalletDto.currency} wallet balance`,
+      };
+    }
+    const currentBalance = currecnyExist.map((el) => {
+      el.amount -= debitWalletDto.amount;
+      return el;
+    });
+
+    await this.walletRepo.save(currentBalance);
+  }
+
+  async balance(walletID: string) {
+    // format the result to make sense as balance here
+    await this.findByWalletID(walletID);
+  }
+
   async findByWalletID(walletID: string) {
     return await this.walletRepo.find({ where: { walletID } });
+  }
+
+  private getCurrencyPairs(walletArray: CreateWalletDto[], currency: string) {
+    return walletArray.filter((el) => el.currency === currency);
+  }
+
+  private checkEligibleDebitAmount(walletAmount: number, debitAmount: number) {
+    return walletAmount >= debitAmount ? true : false;
   }
 }
