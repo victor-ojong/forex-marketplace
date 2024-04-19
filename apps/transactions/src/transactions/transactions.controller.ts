@@ -1,26 +1,27 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Param, Get, Body } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  @Get('/sell')
-  sell(@Param('id') id: string) {
-    return this.transactionsService.findOne(+id);
+  @Post('/sell')
+  sell(@Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionsService.findOne(createTransactionDto);
   }
 
-  @Delete('/buy')
-  buy(@Param('id') id: string) {
-    return this.transactionsService.remove(+id);
+  @Post('/buy')
+  buy(@Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionsService.findOne(createTransactionDto);
   }
 
-  @Delete('/view-market')
+  @Get('/view-market')
   market(@Param('id') id: string) {
     return this.transactionsService.remove(+id);
   }
 
-  @Delete('/history')
+  @Get('/history')
   history(@Param('id') id: string) {
     return this.transactionsService.remove(+id);
   }

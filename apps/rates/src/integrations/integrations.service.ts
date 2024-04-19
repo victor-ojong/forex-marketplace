@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { CreateIntegrationDto } from './dto/create-integration.dto';
-import { UpdateIntegrationDto } from './dto/update-integration.dto';
 
 @Injectable()
 export class IntegrationsService {
-  create(createIntegrationDto: CreateIntegrationDto) {
-    return 'This action adds a new integration';
-  }
+  async getRates(currencyCode: string) {
+    console.log(currencyCode);
+    const apiUrl = `https://v6.exchangerate-api.com/v6/fd8afa3bfd2ef394f1f8b20e/latest/${currencyCode}`;
 
-  findAll() {
-    return `This action returns all integrations`;
-  }
+    try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        return { result: 'fail', message: 'Network response was not ok' };
+      }
 
-  findOne(id: number) {
-    return `This action returns a #${id} integration`;
-  }
-
-  update(id: number, updateIntegrationDto: UpdateIntegrationDto) {
-    return `This action updates a #${id} integration`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} integration`;
+      const data = await response.json();
+      data.terms_of_use = undefined;
+      data.time_last_update_unix = undefined;
+      data.time_next_update_unix = undefined;
+      data.documentation = undefined;
+      return data;
+    } catch (error) {
+      return {
+        result: 'fail',
+        message: 'There was a problem with the fetch operation',
+      };
+    }
   }
 }
