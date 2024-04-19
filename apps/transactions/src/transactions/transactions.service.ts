@@ -1,26 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transactions } from './entities/transaction.entity';
+import { Repository } from 'typeorm';
+import { Wallet } from './entities/wallet.entity';
 
 @Injectable()
 export class TransactionsService {
-  create(createTransactionDto: CreateTransactionDto) {
+  constructor(
+    @InjectRepository(Transactions)
+    private transactionRepo: Repository<Transactions>,
+    @InjectRepository(Wallet) private walletRepo: Repository<Wallet>,
+  ) {}
+
+  async buyOrder(createTransactionDto: CreateTransactionDto) {
+    // get user input and do api grpc call to rates service
+    // get API reference value
+
+    //
     return 'This action adds a new transaction';
   }
 
-  findAll() {
-    return `This action returns all transactions`;
+  async sellOrder(createTransactionDto: CreateTransactionDto) {
+    // get user input and do api grpc call to rates service
+    // get API reference value
+
+    //
+    return 'This action adds a new transaction';
+  }
+  async calculateExchangeValue(rate: number, amount: number) {
+    return rate * amount;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  async viewHistory(walletID: string) {
+    return await this.transactionRepo.find({ where: { walletID } });
+    //
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
+  async viewMarket() {
+    //just get the market value and return
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+  async checkValidBalance() {
+    //
+  }
+
+  async getRates(rates: any, baseCurrency: string, currency: string) {
+    //
+    rates.conversion_rates[currency];
   }
 }
