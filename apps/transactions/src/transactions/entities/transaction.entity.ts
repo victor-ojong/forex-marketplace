@@ -1,19 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, ObjectIdColumn, ObjectId, BaseEntity } from 'typeorm';
 
 @Entity()
-export class Transactions {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Transactions extends BaseEntity {
+  @ObjectIdColumn()
+  id: ObjectId;
 
   @Column()
-  firstName: string;
+  walletID: string;
 
   @Column()
-  lastName: string;
+  type: 'sell' | 'buy';
 
   @Column()
-  email: string;
+  currencyPair: string;
 
-  @Column({ nullable: true })
-  age: number;
+  @Column()
+  timestamp: Date;
+
+  @Column()
+  sellPrice: number;
+
+  @Column()
+  buyPrice: number;
 }

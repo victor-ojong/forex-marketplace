@@ -1,45 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { IntegrationsService } from './integrations.service';
-import { CreateIntegrationDto } from './dto/create-integration.dto';
-import { UpdateIntegrationDto } from './dto/update-integration.dto';
 
-@Controller('integrations')
+@Controller('rates')
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 
-  @Post()
-  create(@Body() createIntegrationDto: CreateIntegrationDto) {
-    return this.integrationsService.create(createIntegrationDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.integrationsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.integrationsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateIntegrationDto: UpdateIntegrationDto,
-  ) {
-    return this.integrationsService.update(+id, updateIntegrationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.integrationsService.remove(+id);
+  @Get('/:currency_code')
+  getRates(@Param() currency_code: any) {
+    return this.integrationsService.getRates(currency_code.currency_code);
   }
 }
