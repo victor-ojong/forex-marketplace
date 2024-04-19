@@ -50,7 +50,6 @@ export class WalletService {
 
     //get the amount and minus it with the one that is on the db and save
     // but first check if the ammount is greater than available balance
-
     const canDebit = this.checkEligibleDebitAmount(
       currecnyExist.at(0).amount,
       debitWalletDto.amount,
@@ -58,7 +57,7 @@ export class WalletService {
 
     if (!canDebit) {
       return {
-        message: `${debitWalletDto.amount} is more than your ${debitWalletDto.currency} wallet balance`,
+        message: ` ${debitWalletDto.amount}.00 ${debitWalletDto.currency} is more than your ${debitWalletDto.currency} wallet balance`,
       };
     }
     const currentBalance = currecnyExist.map((el) => {
@@ -66,12 +65,25 @@ export class WalletService {
       return el;
     });
 
-    await this.walletRepo.save(currentBalance);
+    return await this.walletRepo.save(currentBalance);
   }
 
   async balance(walletID: string) {
+    if (!walletID) {
+      return {
+        status: 'fail',
+        message: 'invalid wallet address',
+      };
+    }
+    const balance = await this.findByWalletID(walletID);
+
+    const filteredBalance = balance.map((el) => {
+      el.walletID = undefined;
+      el._id = undefined;
+      return el;
+    });
     // format the result to make sense as balance here
-    await this.findByWalletID(walletID);
+    return { balance: filteredBalance };
   }
 
   async findByWalletID(walletID: string) {
