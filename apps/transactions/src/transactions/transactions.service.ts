@@ -45,7 +45,7 @@ export class TransactionsService {
     if (!this.isValidBalance(exchangeValue, amount)) {
       return {
         status: 'fail',
-        message: `your current ballance is too low for this transaction`,
+        message: `insufficient fund`,
       };
     }
 
