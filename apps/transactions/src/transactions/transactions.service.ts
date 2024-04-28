@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Transactions } from './entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
+import { RatesServices } from './currency.service';
 
 @Injectable()
 export class TransactionsService {
   constructor(
     @InjectRepository(Transactions)
     private transactionRepo: Repository<Transactions>,
+    private ratesService: RatesServices,
     @InjectRepository(Wallet) private walletRepo: Repository<Wallet>,
   ) {}
 
@@ -83,19 +85,29 @@ export class TransactionsService {
     return await this.transactionRepo.find({ where: { walletID } });
   }
 
-  async viewMarket() {
-    //just get the market value and return
-  }
-
   async isValidBalance(exchangeValue: number, userBalance: number) {
     return exchangeValue <= userBalance;
   }
 
-  async getRatesValue(baseCurrency: string, currency: string, amount: number) {
-    // do a grpc call and get rates using the base currency
-    const rate = rates.conversion_rates[currency];
+  async getRatesValue(
+    baseCurrency: string,
+    currency: string,
+    amount: number,
+  ): Promise<number> {
+    const rates = await this.ratesService.getCurrencyRates(baseCurrency);
+    try {
+      const rate = rates.conversionRates.find(
+        (rate) => rate.currencyCode === currency,
+      )?.rate;
 
-    return rate * amount;
+      if (rate === undefined) {
+        throw new Error(`Conversion rate for currency ${currency} not found`);
+      }
+
+      return rate * amount;
+    } catch (error) {
+      throw new Error(`Error fetching rates: ${error.message}`);
+    }
   }
 
   async getwallet(walletID: string) {
