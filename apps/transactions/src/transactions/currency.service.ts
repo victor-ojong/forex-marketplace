@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class RatesService {
+export class RatesServices {
   async getCurrencyRates(currencyCode: string) {
     console.log(currencyCode);
     const apiUrl = `https://v6.exchangerate-api.com/v6/fd8afa3bfd2ef394f1f8b20e/latest/${currencyCode}`;

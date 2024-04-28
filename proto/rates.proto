@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package rates;
+
+message ConversionRate {
+  string currency_code = 1;
+  double rate = 2;
+}
+
+message CurrencyResponse {
+  string result = 1;
+  string time_last_update_utc = 2;
+  string time_next_update_utc = 3;
+  string base_code = 4;
+  repeated ConversionRate conversion_rates = 5;
+}
+
+message CreateRatesMessage {
+  string currency = 1;
+}
+
+service RatesService {
+  rpc GetCurrencyRates (CreateRatesMessage) returns (CurrencyResponse){};
+}

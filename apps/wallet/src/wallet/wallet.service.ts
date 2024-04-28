@@ -49,7 +49,7 @@ export class WalletService {
     }
 
     //get the amount and minus it with the one that is on the db and save
-    // but first check if the ammount is greater than available balance
+    // but first check if the amount is greater than available balance
     const canDebit = this.checkEligibleDebitAmount(
       currecnyExist.at(0).amount,
       debitWalletDto.amount,

@@ -16,11 +16,6 @@ export class TransactionsController {
     return this.transactionsService.buyOrder(createTransactionDto);
   }
 
-  @Get('/view-market')
-  viewMarket() {
-    return this.transactionsService.viewMarket();
-  }
-
   @Get('/history')
   viewHistory() {
     return this.transactionsService.viewHistory('99999');
