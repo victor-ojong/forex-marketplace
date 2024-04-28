@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transactions } from './entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
 import { RatesServices } from './currency.service';
+import { BuyTransactionDto } from './dto/buy-forex-transaction.dto';
+import { SellTransactionDto } from './dto/sell-forex-transaction.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -15,7 +16,7 @@ export class TransactionsService {
     @InjectRepository(Wallet) private walletRepo: Repository<Wallet>,
   ) {}
 
-  async buyOrder(createTransactionDto: CreateTransactionDto) {
+  async buyOrder(createTransactionDto: BuyTransactionDto) {
     const [baseCurrency, currency] =
       createTransactionDto.currencyPair.split('/');
 
@@ -65,19 +66,20 @@ export class TransactionsService {
       currency: baseCurrency,
     });
 
-    // wallet updating
+    // updating wallet
     await this.walletRepo.save(newWallet.concat(addWallet));
 
-    //2. create a transaction document and save it
-    const newTransaction = this.transactionRepo.create(createTransactionDto);
+    //2. create a transaction history document and save it
+    const newTransaction = this.transactionRepo.create({
+      ...createTransactionDto,
+      type: 'buy',
+    });
     return await this.transactionRepo.save(newTransaction);
   }
 
-  async sellOrder(createTransactionDto: CreateTransactionDto) {
+  async sellOrder(createTransactionDto: SellTransactionDto) {
     // get user input and do api grpc call to rates service
     // get API reference value
-
-    //
     return createTransactionDto;
   }
 

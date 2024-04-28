@@ -82,7 +82,7 @@ export class WalletService {
       el._id = undefined;
       return el;
     });
-    // format the result to make sense as balance here
+
     return { balance: filteredBalance };
   }
 
