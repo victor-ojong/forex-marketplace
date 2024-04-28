@@ -8,15 +8,11 @@ export class WalletController {
 
   @Post('/credit')
   async credit(@Body() creditDto: CreateWalletDto) {
-    // get wallet id from current loged in user
     return await this.walletService.deposit(creditDto);
   }
 
   @Post('/debit')
   async debit(@Body() creditDto: CreateWalletDto) {
-    // get wallet id from current loged in user
-    // the wallet id coming from the client should be the receiver wallet id
-    // write a flow that handles that
     return await this.walletService.debit(creditDto);
   }
 
